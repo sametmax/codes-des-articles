@@ -7,6 +7,8 @@ from __future__ import unicode_literals
 """
     Un script tout pourri qui télécharge plein de page et les sauvegarde
     dans une base de données sqlites.
+
+    On écrit dans un fichier de log les opérations effectuées.
 """
 
 import re
@@ -26,14 +28,16 @@ try:
     c.execute('''
         CREATE TABLE pages (
             id INTEGER PRIMARY KEY,
-            title TEXT,
+            nom TEXT,
             html TEXT
         )'''
     )
 except sqlite3.OperationalError:
     pass
 
-for name, page in pages:
+log = open('backup.log', 'wa')
+
+for nom, page in pages:
 
     # ceci est une manière très fragile de télécharger et
     # parser du HTML. Utilisez plutôt scrapy et beautifulsoup
@@ -54,8 +58,20 @@ for name, page in pages:
     # car c'est l'encoding de sqlite par défaut donc passer des chaînes
     # unicode marche, et toutes les chaînes de mon programme sont en unicode
     # grace à mon premier import
-    c.execute("""INSERT INTO pages (title, html) VALUES (?, ?)""", (name, html))
+    c.execute("""INSERT INTO pages (nom, html) VALUES (?, ?)""", (nom, html))
+
+    # j'écris dans mon fichier en UTF8 car c'est ce que je veux pouvoir lire
+    # plus tard
+    msg = u"Page '{}' sauvée\n".format(nom)
+    log.write(msg.encode('utf8'))
+
+    # notez que si je ne fais pas encode(), soit:
+    # - j'ai un objet 'unicode' et ça plante
+    # - j'ai un objet 'str' et ça va marcher mais mon fichier contiendra
+    #   l'encoding de la chaîne initiale (qui ici serait aussi UTF8, mais
+    #   ce n'est pas toujours le cas)
 
 conn.commit()
 c.close()
 
+log.close()
