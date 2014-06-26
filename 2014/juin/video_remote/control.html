@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video</title>
+  <meta charset='utf-8'>
+  <script src="http://autobahn.ws/static/deps/autobahn.js"
+         type="text/javascript"></script>
+  <style type="text/css">
+    #controls {
+      width:300px;
+      margin:auto;
+    }
+    #controls input {
+      vertical-align:middle;
+    }
+  </style>
+</head>
+<body>
+  <p id="controls">
+    <!-- Marrant de se dire qu'en 2000, le JS inline était
+         considéré comme démoniaque, et maintenant avec
+         angularjs et cie, c'est exactement ce que tout
+         le monde fait...
+         Bref, on attache le clic sur nos contrôles à des
+         méthodes de notre objet qui va se charger de la
+         logique. -->
+
+    <button id="play" onclick="control.togglePlay()">Play</button>
+    <input id="volume"
+                    onchange="control.volume(this.value)"
+                    type="range">
+  </p>
+</body>
+
+<script>
+/* L'objet qui se charge de la logique de nos
+   controles play/pause et changement de
+   volume.
+   Rien de fou, il change l'affichage
+   du bouton et du slider selon qu'on
+   est en pause/play et la valeur du
+   volume.
+   */
+var control = {
+   playing: false,
+   setPlaying: function(val){
+      control.playing = val;
+      var button = window.document.getElementById('play');
+      if (!val){
+         button.innerHTML = 'Play'
+      } else {
+         button.innerHTML = 'Pause';
+      }
+   },
+   setVolume: function(val){
+      var slider = window.document.getElementById('volume');
+      slider.innerHTML = val;
+   }
+};
+window.onload = function(){
+  var connection = new autobahn.Connection({
+    url: 'ws://localhost:8080/',
+    realm: 'realm1'
+  });
+
+  connection.onopen = function (session) {
+
+    /* Récupération de l'ID dans le hash de l'URL */
+    var uuid = window.location.hash.replace('#', '');
+
+    /* Mise à jour des controles selon le status actuel
+       du player grace à un appel RPC vers notre autre
+       page. */
+    session.call(uuid + '.status').then(function(status){
+
+      control.setPlaying(status['playing']);
+      control.setVolume(status['volume'])
+
+      /* On attache l'appui sur les controles à
+         un appel de la fonction play() sur le
+         player distant. L'uuid nous permet
+         de n'envoyer l'événement que sur le
+         bon player. */
+      control.togglePlay = function() {
+        if (control.playing){
+          session.call(uuid + '.pause');
+        } else {
+          session.call(uuid + '.play');
+        }
+      };
+
+      control.volume = function(val){
+        session.call(uuid + '.volume', [val / 100]);
+      };
+
+      /* On ajoute un callback sur les événements
+         de changement de status du player. Si
+         quelqu'un fait play/pause ou change le
+         volume, on veut mettre à jour la page. */
+      session.subscribe(uuid + '.play', function(){
+        control.setPlaying(true);
+      });
+
+      session.subscribe(uuid + '.pause', function(){
+        control.setPlaying(false);
+      });
+
+      session.subscribe(uuid + '.volume', function(val){
+        control.setVolume(val * 100);
+      });
+    });
+  };
+
+  connection.open();
+};
+
+</script>
+
+</html>
+
