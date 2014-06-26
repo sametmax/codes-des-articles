@@ -68,7 +68,7 @@ def get_uuid():
 # On lance l'application. Ceci va lancer le serveur
 # puis le client. On peut désactiver le lancement du
 # serveur une fois qu'on met tout ça en prod.
-app.run()
+app.run(url="ws://0.0.0.0:8080/")
 # On ne peut rien mettre comme code ici, il faut le
 # mettre dans @app.signal('onjoined') si on veut
 # entrer du code après que l'app soit lancée.

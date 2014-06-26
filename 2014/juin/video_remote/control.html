@@ -3,16 +3,22 @@
 <head>
   <title>Télécommande</title>
   <meta charset='utf-8'>
-  <script src="http://autobahn.ws/static/deps/autobahn.js"
+  <script src="https://autobahn.s3.amazonaws.com/autobahnjs/latest/autobahn.min.jgz"
          type="text/javascript"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style type="text/css">
     #controls {
       width:300px;
       margin:auto;
     }
+    #controls button {
+      font-size: 1em;
+    }
     #controls input {
       vertical-align:middle;
-    }
+       width: 200px;
+       height:20px;
+   }
   </style>
 </head>
 <body>
@@ -59,7 +65,7 @@ var control = {
 };
 window.onload = function(){
   var connection = new autobahn.Connection({
-    url: 'ws://localhost:8080/',
+    url: 'ws://' + window.location.hostname + ':8080/',
     realm: 'realm1'
   });
 
@@ -74,7 +80,7 @@ window.onload = function(){
     session.call(uuid + '.status').then(function(status){
 
       control.setPlaying(status['playing']);
-      control.setVolume(status['volume'])
+      control.setVolume(status['volume'] * 100)
 
       /* On attache l'appui sur les controles à
          un appel de la fonction play() sur le
