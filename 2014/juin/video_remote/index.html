@@ -132,7 +132,7 @@
         });
 
         session.register(uuid + '.volume', function(val){
-           video.volume = val;
+           video.volume = val[0];
         });
 
         session.register(uuid + '.status', function(val){
@@ -153,7 +153,7 @@
           */
        video.addEventListener('play', function(){
          /* On publie un message indiquant que
-            le player a recommancé à lire la video.
+            le player a recommencé à lire la vidéo.
             */
          session.publish(uuid + '.play');
        });
@@ -163,7 +163,7 @@
         });
 
         video.addEventListener('volumechange', function(){
-          session.publish(uuid + '.volume');
+          session.publish(uuid + '.volume', [video.volume]);
         });
 
      });
