@@ -5,10 +5,12 @@
   <meta charset='utf-8'>
   <script src="https://autobahn.s3.amazonaws.com/autobahnjs/latest/autobahn.min.jgz"
          type="text/javascript"></script>
+  <!-- Zoom du viewport sur mobile pour éviter d'avoir
+       à le faire à la main. -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style type="text/css">
     #controls {
-      width:300px;
+      width:350px;
       margin:auto;
     }
     #controls button {
@@ -90,8 +92,10 @@ window.onload = function(){
       control.togglePlay = function() {
         if (control.playing){
           session.call(uuid + '.pause');
+          control.setPlaying(false);
         } else {
           session.call(uuid + '.play');
+          control.setPlaying(true);
         }
       };
 
