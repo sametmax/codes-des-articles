@@ -1,0 +1,22 @@
+<!doctype html>
+<!-- Lien entre l'app et a page -->
+<html ng-app="tuto">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hello Angular</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.js"></script>
+    <script type="text/javascript">
+
+    // Déclaration de l'app
+    var app = angular.module('tuto', [])
+
+    // Lancement du code quand angular est prêt
+    app.run(function(){
+        alert('Hello !')
+    })
+
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

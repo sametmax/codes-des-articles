@@ -1,0 +1,26 @@
+<!doctype html>
+<html ng-app="tuto">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hello Angular</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.js"></script>
+    <script type="text/javascript">
+
+    /* La je recréé l'app à chaque fois pour des raisons de praticité, mais
+        dans un vrai code vous auriez ça dans un fichier à part, une seule
+        fois */
+    var app = angular.module('tuto', [])
+
+    // Création d'un controller, et attachement d'une variable au scope.
+    app.controller('HelloCtrl', function($scope){
+        // Attachement d'une donnée au scope
+        $scope.hello = "Hello"
+    })
+
+    </script>
+  </head>
+  <body ng-controller="HelloCtrl">
+    <!-- Affichage du message attaché au scope -->
+    <h1>{{ hello }}</h1>
+  </body>
+</html>
