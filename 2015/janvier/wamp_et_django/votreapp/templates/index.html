@@ -1,0 +1,33 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>
+       UUID
+    </title>
+
+    <script src="{% static 'autobahn.min.js' %}"></script>
+    <script type="text/javascript">
+      var connection = new autobahn.Connection({
+         url: "ws://localhost:8080/ws",
+         realm: "realm1"
+      });
+
+     connection.onopen = function (session) {
+
+        session.call("uuid").then(function (uuid) {
+          var p = document.getElementById('uuid');
+          p.innerHTML = uuid;
+        });
+     };
+
+     connection.open();
+    </script>
+</head>
+<body>
+<h2>UUID</h2>
+<p id="uuid"></p>
+</body>
+</html>
+
