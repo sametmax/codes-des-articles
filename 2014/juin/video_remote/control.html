@@ -67,7 +67,7 @@ var control = {
 };
 window.onload = function(){
   var connection = new autobahn.Connection({
-    url: 'ws://' + window.location.hostname + ':8080/',
+    url: 'ws://' + window.location.hostname + ':8080/ws',
     realm: 'realm1'
   });
 

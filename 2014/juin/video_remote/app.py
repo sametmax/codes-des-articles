@@ -29,6 +29,7 @@ app._data = {}
 # jetable qu'un utilisera une seule fois".
 @app.signal('onjoined')
 def _():
+   print('Notre client Python est connecté au routeur sur ws://127.0.0.1:8080/ws')
    # On récupère notre adresse IP sur le réseau local
    # C'est une astuce qui se connecte à un DNS, et donc
    # on a besoin d'une connexion internet.
@@ -65,11 +66,10 @@ def get_uuid():
    # ex: b27f7e9360c04efabfae5ac21a8f4e3c
    return str(uuid.uuid4()).replace('-', '')
 
-# On lance l'application. Ceci va lancer le serveur
-# puis le client. On peut désactiver le lancement du
-# serveur une fois qu'on met tout ça en prod.
+
+# On lance l'application qui va se connecter au routeur crossbar.
 if __name__ == "__main__":
-   app.run(url="ws://0.0.0.0:8080/")
+   app.run(url="ws://127.0.0.1:8080/ws")
 # On ne peut rien mettre comme code ici, il faut le
 # mettre dans @app.signal('onjoined') si on veut
 # entrer du code après que l'app soit lancée.

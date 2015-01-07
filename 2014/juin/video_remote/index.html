@@ -77,8 +77,9 @@
        les valeurs par défaut du serveur de
        dev. On ouvre explicitement la connection
        à la fin du script. */
+
     var connection = new autobahn.Connection({
-       url: 'ws://' + window.location.hostname + ':8080/',
+       url: 'ws://' + window.location.hostname + ':8080/ws',
        realm: 'realm1'
     });
 
@@ -88,15 +89,20 @@
        un puits sans fond. */
     connection.onopen = function (session) {
 
-      /* Appel de la fonction ip() sur le serveur */
+      /* Appel de la fonction ip() sur le serveur .
+         Ainsi on aura l'IP externe de notre
+         machine notre télécommande pourra pointer
+         dessus. C'est indispensable car on
+         peut ouvrir la télécommande sur une
+         autre machine (ex : un téléphone) */
       session.call('demo.ip')
 
-      /* Une fois qu'on a récupéré l'IP,
+      /* Une fois qu'on a récupéré l'IP ,
          on peut fabriquer l'URL de notre
          projet et on appelle la fonction
          get_uuid() du serveur */
       .then(function(ip){
-        url = 'http://' + ip + ':8000';
+        url = 'http://' + ip + ':8080';
         return session.call('demo.uuid');
       })
 
