@@ -1,7 +1,4 @@
-
 {
-   "controller": {
-   },
    "workers": [
       {
          "type": "router",
@@ -38,8 +35,7 @@
                      "directory": ".."
                   },
                   "ws": {
-                     "type": "websocket",
-                     "url": "ws://0.0.0.0:8080/ws"
+                     "type": "websocket"
                   }
                }
             }
