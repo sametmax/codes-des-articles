@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+
+    <!-- De quoi cacher un bloc facilement -->
+    <style type="text/css">
+        .hide {display:none;}
+    </style>
+
+    <!--
+        La lib JS qui permet de parler WAMP .
+
+        Ici je suppose qu'on utilise un navigateur qui support websocket.
+        Il est possible de faire du fallback sur flash ou long poll, mais
+        ce sont des dépendances en plus.
+    -->
+    <script src="https://autobahn.s3.amazonaws.com/autobahnjs/latest/autobahn.min.jgz"
+           type="text/javascript"></script>
+
+
+    <!-- Tout notre code client, inline pour faciliter votre lecture -->
+    <script type="text/javascript">
+
+      /* Connexion à notre serveur WAMP */
+      window.addEventListener("load", function(){
+        var connection = new autobahn.Connection({
+           url: 'ws://127.0.0.1:8080/ws',
+           realm: 'realm1'
+        });
+
+        /* Quand la connexion est ouverte, exécuter ce code */
+        connection.onopen = function(session) {
+
+          var clients = document.getElementById("clients");
+
+          /* Quand on reçoit l'événement clientstats, lancer cette fonction */
+          session.subscribe('clientstats', function(args){
+            var stats = args[0];
+            var serverNode = document.getElementById(stats.ip);
+
+            /*
+                 Créer un li contenant un h2 et un dl pour ce client si
+                 il n'est pas encore dans la page.
+            */
+            if (!serverNode){
+                serverNode = document.createElement("li");
+                serverNode.id = stats.ip;
+                serverNode.appendChild(document.createElement("h2"));
+                serverNode.appendChild(document.createElement("dl"));
+                serverNode.firstChild.innerHTML = stats.name + " (" + stats.ip + ")";
+                clients.appendChild(serverNode);
+
+                // Cacher les infos du serveur si il est désactivé.
+                session.subscribe('clientconfig.' + stats.ip, function(args){
+                    var config = args[0];
+                    if (config.disabled){
+                        var serverNode = document.getElementById(config.ip);
+                        serverNode.className = "hide";
+                    }
+                });
+
+            }
+
+            // Remettre à zéro le contenu du li du serveur.
+            serverNode.className = "";
+            var dl = serverNode.lastChild;
+            while (dl.hasChildNodes()) {
+                dl.removeChild(dl.lastChild);
+            }
+
+            // Si on a des infos sur le CPU, les afficher
+            if (stats.cpus){
+                var cpus = document.createElement("dt");
+                cpus.innerHTML = "CPUs:";
+                dl.appendChild(cpus);
+                for (var i = 0; i < stats.cpus.length; i++) {
+                    var cpu = document.createElement("dd");
+                    cpu.innerHTML = stats.cpus[i];
+                    dl.appendChild(cpu);
+                };
+            }
+
+            // Si on a des infos sur l'espace disque, les afficher
+            if (stats.disks){
+                var disks = document.createElement("dt");
+                disks.innerHTML = "Disk usage:";
+                dl.appendChild(disks);
+                for (key in stats.disks) {
+                    var disk = document.createElement("dd");
+                    disk.innerHTML = "<strong>" + key + "</strong>: " + stats.disks[key];
+                    dl.appendChild(disk);
+                };
+            }
+
+            // Si on a des infos sur l'usage mémoire, les afficher.
+            if (stats.memory){
+                var memory = document.createElement("dt");
+                memory.innerHTML = "Memory:";
+                dl.appendChild(memory);
+                var memVal = document.createElement("dd");
+                memVal.innerHTML = stats.memory;
+                dl.appendChild(memVal);
+            }
+
+          });
+
+        };
+
+        // Ouvrir la connexion avec le routeur WAMP.
+        connection.open();
+
+      });
+    </script>
+
+    <title> Monitoring</title>
+</head>
+<body>
+    <h1> Monitoring </h1>
+    <ul id="clients"></ul>
+</body>
+
+</html>
+
