@@ -42,6 +42,10 @@
                      "type": "pusher",
                      "realm": "realm1",
                      "role": "anonymous"
+                  },
+                  "static": {
+                     "type": "static",
+                     "directory": "../static"
                   }
                }
             }
